@@ -15,14 +15,24 @@ function setRefreshCookie(res: Response, token: string, expiresAt: Date): void {
   res.cookie(REFRESH_COOKIE_NAME, token, {
     httpOnly: true,
     secure: isProduction,
-    sameSite: "strict",
+    // "strict" works in dev because localhost:5173 and localhost:4000 are
+    // same-site (same host, different port). In production the client
+    // (Vercel) and API (a separate host, e.g. Render) are genuinely
+    // different sites, so a Strict cookie would never be sent on the
+    // fetch from the client to /api/auth/refresh — login would appear to
+    // work once, then silently fail to persist. "None" (paired with
+    // Secure, already true in production) is required for that cross-site
+    // request to carry the cookie at all.
+    sameSite: isProduction ? "none" : "strict",
     expires: expiresAt,
     path: "/api/auth",
   });
 }
 
 function clearRefreshCookie(res: Response): void {
-  res.clearCookie(REFRESH_COOKIE_NAME, { path: "/api/auth" });
+  // Must match the attributes it was set with (secure/sameSite), or some
+  // browsers won't recognize this as the same cookie to overwrite.
+  res.clearCookie(REFRESH_COOKIE_NAME, { path: "/api/auth", secure: isProduction, sameSite: isProduction ? "none" : "strict" });
 }
 
 export async function login(req: Request, res: Response): Promise<void> {

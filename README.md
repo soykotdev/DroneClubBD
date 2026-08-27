@@ -159,6 +159,18 @@ npm run start --workspace=server   # serves the API from server/dist/src/server.
 
 The client build (`client/dist/`) is static output — serve it from any static host or CDN, with the API reachable at the path configured in `VITE_API_BASE_URL` at build time. Point your reverse proxy's `/uploads` path at the server's upload directory (or your S3 bucket, if `STORAGE_PROVIDER=s3`).
 
+### 10.1 Recommended split: Vercel (client) + Render (API)
+
+Vercel hosts static builds and serverless functions — it does not run this Express server as a persistent process. The straightforward pairing:
+
+1. **API on Render**: `render.yaml` at the repo root is a ready-to-use Blueprint. In the Render dashboard, "New +" → "Blueprint" → pick this repo. Fill in the `sync: false` values it leaves blank: `MONGODB_URI` (your rotated Atlas string), `CLIENT_URL` and `CORS_ALLOWED_ORIGINS` (your Vercel URL, e.g. `https://your-app.vercel.app`), and `ADMIN_EMAIL` / `ADMIN_INITIAL_PASSWORD`. Render injects `PORT` itself — don't set it. After the first deploy, run `npm run create-admin --workspace=server` once via Render's shell (or locally against the same `MONGODB_URI`) to create the Super Admin account, and `npm run seed --workspace=server` to populate services/equipment.
+2. **Client on Vercel**: import the repo, set the project root to `client/`, framework preset Vite. Set `VITE_API_BASE_URL` to your Render service's URL plus `/api` (e.g. `https://droneclub-api.onrender.com/api`) — this must be the **real deployed API URL**, not `localhost`.
+3. Once both are live, update the Render service's `CLIENT_URL` / `CORS_ALLOWED_ORIGINS` to match the final Vercel domain if it changed, and redeploy the API so CORS reflects it.
+
+**Cross-site cookie note**: because the client and API sit on different domains in this split (`*.vercel.app` vs `*.onrender.com`), the refresh-token cookie is set with `SameSite=None; Secure` in production (see `server/src/controllers/authController.ts`) — required for the browser to send it on cross-site requests at all. In local development both run on `localhost` (same site, different ports), so `SameSite=Strict` is used there instead.
+
+**Free-tier caveats**: Render's free web services spin down after inactivity (the first request after idle takes ~30–50s to wake up) and use an **ephemeral filesystem** — anything written to `uploads/` (inspection-request attachments, media library files) is lost on every redeploy or restart. `STORAGE_PROVIDER=s3` is the fix for persistent uploads in production, but that provider is currently a stub (see `server/src/storage/s3StorageProvider.ts`) — implement it with `@aws-sdk/client-s3` before relying on file uploads surviving a redeploy.
+
 ## 11. Backup Recommendations
 
 - Enable MongoDB Atlas's continuous backups (or a scheduled `mongodump` for a self-hosted instance).
