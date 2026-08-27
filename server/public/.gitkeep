@@ -1,0 +1,4 @@
+This project has no static output — everything is served by the api/index.ts
+serverless function (see server/vercel.json). This empty directory exists
+only because Vercel's zero-config build expects a "public" output directory
+to exist, even for a functions-only project.
