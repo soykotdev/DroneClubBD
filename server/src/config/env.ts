@@ -21,7 +21,10 @@ const envSchema = z.object({
   ADMIN_EMAIL: z.string().email().optional(),
   ADMIN_INITIAL_PASSWORD: z.string().min(12).optional(),
 
-  STORAGE_PROVIDER: z.enum(["local", "s3"]).default("local"),
+  STORAGE_PROVIDER: z.enum(["local", "s3", "vercel-blob"]).default("local"),
+  // Injected automatically by Vercel once a Blob store is connected to the
+  // project; set manually here only for local dev against the same store.
+  BLOB_READ_WRITE_TOKEN: z.string().optional(),
   UPLOAD_DIRECTORY: z.string().default("uploads"),
 
   SMTP_HOST: z.string().optional().default(""),

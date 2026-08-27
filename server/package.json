@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@droneclub/shared": "*",
+    "@vercel/blob": "^2.8.0",
     "argon2": "^0.41.1",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",

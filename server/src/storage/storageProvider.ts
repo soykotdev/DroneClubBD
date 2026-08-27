@@ -14,12 +14,18 @@ export interface StorageProvider {
 /**
  * Storage abstraction per spec Section 16. `local` writes outside the
  * client's public source directory and serves files through a dedicated
- * Express static route (or, for private reports, a signed backend-controlled
- * download endpoint — never a direct static path). Swap STORAGE_PROVIDER to
- * `s3` in production without touching any calling code.
+ * Express static route — only viable when the server runs as a normal
+ * persistent process with a writable disk. `vercel-blob` is the fit when
+ * the API runs as a Vercel serverless function (no persistent local disk
+ * at all). `s3` covers any other S3-compatible host. Swap
+ * STORAGE_PROVIDER without touching any calling code.
  */
 export async function getStorageProvider(): Promise<StorageProvider> {
   const { env } = await import("../config/env.js");
+  if (env.STORAGE_PROVIDER === "vercel-blob") {
+    const { vercelBlobStorageProvider } = await import("./vercelBlobStorageProvider.js");
+    return vercelBlobStorageProvider;
+  }
   if (env.STORAGE_PROVIDER === "s3") {
     const { s3StorageProvider } = await import("./s3StorageProvider.js");
     return s3StorageProvider;
