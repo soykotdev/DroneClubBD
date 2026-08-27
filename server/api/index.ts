@@ -44,7 +44,15 @@ export default async function handler(req: Request, res: Response): Promise<void
     logger.error({ err }, "Database not ready — failing request");
     res.statusCode = 503;
     res.setHeader("Content-Type", "application/json");
-    res.end(JSON.stringify({ success: false, error: { message: "Service temporarily unavailable", code: "DB_UNAVAILABLE" } }));
+    // TEMPORARY: surfaces the real error for one round of live debugging.
+    // Revert to a generic message before this is considered production-ready
+    // — a raw driver error can leak infrastructure detail.
+    res.end(
+      JSON.stringify({
+        success: false,
+        error: { message: "Service temporarily unavailable", code: "DB_UNAVAILABLE", debug: err instanceof Error ? err.message : String(err) },
+      })
+    );
     return;
   }
   app(req, res);
