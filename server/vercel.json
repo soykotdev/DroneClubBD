@@ -1,6 +1,6 @@
 {
   "framework": null,
-  "buildCommand": "cd .. && npx tsc -p shared/tsconfig.json && npx tsc -p server/tsconfig.json",
+  "buildCommand": "cd ../shared && npx --no-install tsc -p tsconfig.json && cd ../server && npx --no-install tsc -p tsconfig.json",
   "installCommand": "npm install --prefix ..",
   "rewrites": [{ "source": "/(.*)", "destination": "/api" }]
 }
