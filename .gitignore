@@ -1,0 +1,46 @@
+# Environment & secrets
+.env
+.env.local
+.env.*.local
+server/.env
+client/.env
+atlas-credentials.env
+*.pem
+*.key
+
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build output
+dist/
+build/
+**/dist/
+**/build/
+client/dist/
+server/dist/
+*.tsbuildinfo
+
+# Uploads (local dev file storage — never commit real uploads)
+server/uploads/
+uploads/
+
+# Logs
+*.log
+npm-debug.log*
+logs/
+
+# Test / coverage
+coverage/
+playwright-report/
+test-results/
+
+# Editor / OS
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+
+# Generated optimized assets (regenerate via npm run prepare-assets)
+client/public/assets/images/generated/

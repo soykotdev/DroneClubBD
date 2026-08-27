@@ -1,0 +1,41 @@
+
+# Local MongoDB fallback for development when an Atlas connection string
+# is not available. Not intended for production use.
+#
+# Usage:
+#   docker compose up -d
+#   MONGODB_URI=mongodb://droneclub:droneclub_dev_only@localhost:27017/droneclub?authSource=admin
+#
+# The credentials below are for local-only, throwaway development data.
+# Do not reuse them anywhere else.
+services:
+  mongo:
+    image: mongo:7
+    container_name: droneclub-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: droneclub
+      MONGO_INITDB_ROOT_PASSWORD: droneclub_dev_only
+      MONGO_INITDB_DATABASE: droneclub
+    volumes:
+      - mongo-data:/data/db
+
+  mongo-express:
+    image: mongo-express:1
+    container_name: droneclub-mongo-express
+    restart: unless-stopped
+    depends_on:
+      - mongo
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: droneclub
+      ME_CONFIG_MONGODB_ADMINPASSWORD: droneclub_dev_only
+      ME_CONFIG_MONGODB_SERVER: mongo
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: droneclub_dev_only
+
+volumes:
+  mongo-data:

@@ -1,0 +1,121 @@
+@import "tailwindcss";
+
+/* Brand tokens — sourced directly from the Drone Club Bangladesh logo
+   (Section 2 of the platform spec). Do not introduce ad-hoc colors
+   elsewhere; extend this file instead. */
+:root {
+  --brand-red: #fa0a0a;
+  --brand-red-dark: #c90808;
+  --brand-red-soft: #ff3b3b;
+  --brand-black: #060606;
+  --brand-surface: #101010;
+  --brand-graphite: #5f5d5e;
+  --brand-grey: #a7a7a7;
+  --brand-light: #f5f5f5;
+  --brand-white: #fefefe;
+  --brand-border: rgba(6, 6, 6, 0.12);
+  --brand-red-glow: rgba(250, 10, 10, 0.28);
+
+  --thermal-orange: #ff6b1a;
+  --thermal-yellow: #ffd84d;
+  --thermal-purple: #6d28d9;
+
+  --status-success: #1a7f4b;
+  --status-warning: #b45309;
+  --status-error: var(--brand-red);
+
+  --motion-fast: 160ms;
+  --motion-normal: 280ms;
+  --motion-slow: 700ms;
+  --ease-brand: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --font-heading: "Space Grotesk", "Sora", system-ui, sans-serif;
+  --font-body: "Inter", "Manrope", system-ui, sans-serif;
+}
+
+@theme {
+  --color-brand-red: var(--brand-red);
+  --color-brand-red-dark: var(--brand-red-dark);
+  --color-brand-black: var(--brand-black);
+  --color-brand-surface: var(--brand-surface);
+  --color-brand-graphite: var(--brand-graphite);
+  --color-brand-grey: var(--brand-grey);
+  --color-brand-light: var(--brand-light);
+  --color-brand-white: var(--brand-white);
+  --font-heading: var(--font-heading);
+  --font-body: var(--font-body);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--brand-white);
+  color: var(--brand-black);
+  font-family: var(--font-body);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  letter-spacing: -0.01em;
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+  background: var(--brand-white);
+  color: var(--brand-black);
+  padding: 0.75rem 1.25rem;
+  border-radius: 0 0 0.5rem 0;
+}
+.skip-link:focus {
+  left: 0;
+}
+
+/* Respect prefers-reduced-motion globally per spec Section 8: opacity
+   transitions remain, large transforms / spin / parallax are neutralized. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Propeller rotation — realistic acceleration/deceleration, used only for
+   loading indicators (never as an ambient full-page animation). */
+@keyframes propeller-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.propeller-spin {
+  animation: propeller-spin 900ms cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  transform-origin: center;
+}
+@media (prefers-reduced-motion: reduce) {
+  .propeller-spin { animation: none; }
+}
+
+/* Red-circle controlled pulse (hotspot / status indicator). */
+@keyframes red-circle-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.15); opacity: 0.75; }
+}
+.red-circle-pulse {
+  animation: red-circle-pulse 1.8s var(--ease-brand) infinite;
+}
+
+/* Expanding scanning ring used for hotspot detection markers. */
+@keyframes scan-ring {
+  0% { transform: scale(0.6); opacity: 0.9; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+.scan-ring {
+  animation: scan-ring 1.6s var(--ease-brand) infinite;
+}
