@@ -1,0 +1,5 @@
+{
+  "framework": "vite",
+  "installCommand": "npm install --prefix .. --include=dev",
+  "buildCommand": "cd ../shared && npx --no-install tsc -p tsconfig.json && cd ../client && npm run build"
+}
